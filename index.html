@@ -60,6 +60,9 @@
       display: inline-block;
       pointer-events: auto;
       margin-top: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
     }
 
     .toggle-btn:hover {
@@ -80,9 +83,8 @@
 
     .collection-header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 15px;
-      flex-wrap: nowrap;
     }
 
     .title-container {
@@ -91,14 +93,12 @@
       align-items: center;
       justify-content: center;
       flex-grow: 1;
-      min-width: 0;
-      word-break: break-word;
       text-align: center;
     }
 
     .title-container h1 {
       font-size: 1.5em;
-      margin: 5px 0;
+      margin: 5px 0 0 0;
     }
 
     .collection-image {
@@ -141,13 +141,14 @@
     @media screen and (max-width: 600px) {
       .collection-header {
         flex-wrap: nowrap;
-        align-items: flex-start;
+        align-items: center;
       }
 
       .title-container {
         flex-grow: 1;
         min-width: 0;
         word-break: break-word;
+        text-align: center;
       }
 
       .collection h1 {
@@ -156,8 +157,8 @@
       }
 
       .collection-image {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
       }
 
       .toggle-btn {
@@ -209,7 +210,7 @@
 
   <img src="Header.jpg" alt="Header Image" class="header-image">
   <h1>COLLECTIONS</h1>
-  
+
   <!-- 1. TIME TRAVEL -->
   <div class="collection">
     <div class="collection-header">
