@@ -83,8 +83,9 @@
 
     .collection-header {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 15px;
+      text-align: center;
     }
 
     .title-container {
@@ -92,8 +93,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex-grow: 1;
-      text-align: center;
+      margin-top: 10px;
     }
 
     .title-container h1 {
@@ -102,10 +102,9 @@
     }
 
     .collection-image {
-      width: 125px;
-      height: 125px;
+      width: 120px;
+      height: 120px;
       border-radius: 15px;
-      flex-shrink: 0;
     }
 
     .spacer {
@@ -140,25 +139,17 @@
 
     @media screen and (max-width: 600px) {
       .collection-header {
-        flex-wrap: nowrap;
         align-items: center;
       }
 
-      .title-container {
-        flex-grow: 1;
-        min-width: 0;
-        word-break: break-word;
-        text-align: center;
+      .collection-image {
+        width: 100px;
+        height: 100px;
       }
 
       .collection h1 {
         font-size: 1.2em;
         line-height: 1.3;
-      }
-
-      .collection-image {
-        width: 80px;
-        height: 80px;
       }
 
       .toggle-btn {
