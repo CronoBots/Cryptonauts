@@ -187,7 +187,7 @@
 
     @media screen and (min-width: 601px) {
       #searchInput, #sortSelect {
-        width: 250px; /* Légère augmentation de 200px à 250px */
+        width: 250px;
       }
     }
   </style>
@@ -199,7 +199,7 @@
   
   <main>
     <section class="collection-list">
-      <h1>Collections</h1>
+      <h1>COLLECTIONS</h1>
       <div id="collections"></div>
     </section>
   </main>
@@ -216,7 +216,7 @@
         id: "legendary",
         title: "LEGENDARY CRYPTONAUTS",
         image: "Legend.png",
-        alt: "Legendary Cryptonauts Collection Icon",
+        alt: "LEGENDARY CRYPTONAUTS COLLECTION ICON",
         date: "SUMMER 2025",
         ownersCount: 0,
         owners: [],
@@ -225,7 +225,7 @@
         id: "collection-0",
         title: "TIME TRAVEL CRYPTONAUTS",
         image: "https://media.nft.crypto.com/3f03eae4-d4db-4ec8-96cd-ff53a95403d0/original.jpg?d=lg-logo5",
-        alt: "TIME TRAVEL Cryptonauts Collection Icon",
+        alt: "TIME TRAVEL CRYPTONAUTS COLLECTION ICON",
         ownersCount: 107,
         owners: [
           { name: "tohmee110", url: "https://crypto.com/nft/profile/tohmee110", count: 32, rank: "gold" },
@@ -240,7 +240,7 @@
         id: "collection-1",
         title: "QUANTUM CRYPTONAUTS V2",
         image: "https://media.nft.crypto.com/c19a171b-0418-4eb2-b3c1-1dcb84616c52/original.jpg?d=lg-logo",
-        alt: "Quantum Cryptonauts V2 Collection Icon",
+        alt: "QUANTUM CRYPTONAUTS V2 COLLECTION ICON",
         ownersCount: 73,
         owners: [
           { name: "noleaster", url: "https://crypto.com/nft/profile/noleaster", count: 17, rank: "gold" },
@@ -255,7 +255,7 @@
         id: "collection-2",
         title: "QUANTUM CRYPTONAUTS",
         image: "https://media.nft.crypto.com/395953dd-72fe-49ba-acb0-f638166b87ae/original.jpg?d=lg-logo",
-        alt: "Quantum Cryptonauts Collection Icon",
+        alt: "QUANTUM CRYPTONAUTS COLLECTION ICON",
         ownersCount: 108,
         owners: [
           { name: "onmywayup1", url: "https://crypto.com/nft/profile/onmywayup1", count: 47, rank: "gold" },
@@ -270,7 +270,7 @@
         id: "collection-3",
         title: "CRYPTONAUTS 2024",
         image: "https://media.nft.crypto.com/84f5f042-7cb0-404f-88d2-43d07a6d2a46/original.jpg?d=lg-logo",
-        alt: "Cryptonauts 2024 Collection Icon",
+        alt: "CRYPTONAUTS 2024 COLLECTION ICON",
         ownersCount: 148,
         owners: [
           { name: "stackse215", url: "https://crypto.com/nft/profile/stackse215", count: 14, rank: "gold" },
@@ -285,7 +285,7 @@
         id: "collection-4",
         title: "CRYPTONAUTS GOLDEN CREW",
         image: "https://media.nft.crypto.com/6d6e7a76-35f6-4918-b851-ddebabf94e2c/original.jpg?d=lg-logo",
-        alt: "Cryptonauts Golden Crew Collection Icon",
+        alt: "CRYPTONAUTS GOLDEN CREW COLLECTION ICON",
         ownersCount: 9,
         owners: [
           { name: "cabezaenlasnubes", url: "https://crypto.com/nft/profile/cabezaenlasnubes", count: 3, rank: "gold" },
@@ -303,7 +303,7 @@
         id: "collection-5",
         title: "CRYPTONAUTS: THE DARK SIDE OF THE DUNE",
         image: "https://media.nft.crypto.com/f3bdf36b-403b-4799-a39f-2c21cea5dc99/original.jpg?d=lg-logo",
-        alt: "Cryptonauts: The dark side of the dune Collection Icon",
+        alt: "CRYPTONAUTS: THE DARK SIDE OF THE DUNE COLLECTION ICON",
         ownersCount: 126,
         owners: [
           { name: "echotpull050", url: "https://crypto.com/nft/profile/echotpull050", count: 15, rank: "gold" },
@@ -318,7 +318,7 @@
         id: "collection-6",
         title: "CRYPTONAUTS",
         image: "https://media.nft.crypto.com/5057c430-e7f5-4462-a6d2-7bb2bfb68700/original.jpg?d=lg-logo",
-        alt: "Cryptonauts Collection Icon",
+        alt: "CRYPTONAUTS COLLECTION ICON",
         ownersCount: 225,
         owners: [
           { name: "santa61", url: "https://crypto.com/nft/profile/santa61", count: 19, rank: "gold" },
@@ -356,7 +356,7 @@
           <div class="title-container">
             <h2>${collection.title}</h2>
             ${collection.date ? `<span style="color: #cc8834; font-weight: 700; margin-top: 8px;">${collection.date}</span>` : ''}
-            ${collection.owners.length ? `<span class="toggle-btn" data-section-id="${collection.id}" aria-controls="${collection.id}" aria-expanded="false" aria-label="Toggle ${collection.title} owners">Show owners</span>` : ''}
+            ${collection.owners.length ? `<span class="toggle-btn" data-section-id="${collection.id}" aria-controls="${collection.id}" aria-expanded="false" aria-label="Toggle ${collection.title} owners">SHOW OWNERS</span>` : ''}
           </div>
         </div>
         ${collection.owners.length ? `
@@ -365,7 +365,7 @@
             <ul>
               ${collection.owners.map(owner => `
                 <li ${owner.rank ? `style="color: ${owner.rank === 'gold' ? 'gold' : owner.rank === 'silver' ? 'silver' : '#cd7f32'}; font-weight: bold;"` : ''}>
-                  <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
+                  <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} CRYPTONAUTS
                   ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
                 </li>
               `).join('')}
@@ -394,7 +394,7 @@
           <ul id="global-owners">
             ${owners.map(owner => `
               <li ${owner.rank ? `style="color: ${owner.rank === 'gold' ? 'gold' : owner.rank === 'silver' ? 'silver' : '#cd7f32'}; font-weight: bold;"` : ''}>
-                <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
+                <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} CRYPTONAUTS
                 ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
               </li>
             `).join('')}
@@ -445,7 +445,7 @@
           if (section) {
             const isHidden = section.classList.contains('hidden');
             section.classList.toggle('hidden', !isHidden);
-            button.textContent = isHidden ? 'Hide owners' : 'Show owners';
+            button.textContent = isHidden ? 'HIDE OWNERS' : 'SHOW OWNERS';
             button.setAttribute('aria-expanded', isHidden);
           }
         });
@@ -453,27 +453,29 @@
 
       // Gestion de la recherche
       const searchInput = document.getElementById('searchInput');
-      const listItems = document.querySelectorAll('#global-owners li');
       searchInput.addEventListener('input', debounce(() => {
         const filter = searchInput.value.toLowerCase();
+        const listItems = document.querySelectorAll('#global-owners li');
         let found = false;
+
         listItems.forEach(item => {
           const text = item.textContent.toLowerCase();
           const match = text.includes(filter);
           item.style.display = match ? '' : 'none';
           if (match) found = true;
         });
+
         const noResults = document.getElementById('no-results');
         if (!found) {
           if (!noResults) {
             const msg = document.createElement('li');
             msg.id = 'no-results';
-            msg.textContent = 'No results found';
+            msg.textContent = 'NO RESULTS FOUND';
             msg.style.color = 'gray';
             document.getElementById('global-owners').appendChild(msg);
           }
-        } else {
-          if (noResults) noResults.remove();
+        } else if (noResults) {
+          noResults.remove();
         }
       }, 300));
 
@@ -489,12 +491,12 @@
         } else if (value === 'name-asc') {
           sortedOwners.sort((a, b) => a.name.localeCompare(b.name));
         } else if (value === 'name-desc') {
-          sortedOwners.sort((a, b) => b.name.localeCompare(a.name));
+          sortedOwners.sort((a, b) => b.name.localeCompare(b.name));
         }
         const globalOwnersUl = document.getElementById('global-owners');
         globalOwnersUl.innerHTML = sortedOwners.map(owner => `
           <li ${owner.rank ? `style="color: ${owner.rank === 'gold' ? 'gold' : owner.rank === 'silver' ? 'silver' : '#cd7f32'}; font-weight: bold;"` : ''}>
-            <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
+            <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} CRYPTONAUTS
             ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
           </li>
         `).join('');
