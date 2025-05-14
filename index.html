@@ -1859,53 +1859,53 @@
         }
       }, 300));
 
-      // Gestion du tri
-      const sortSelect = document.getElementById('sortSelect');
-      sortSelect.addEventListener('change', () => {
-        const value = sortSelect.value;
-        const sortedOwners = [...globalOwnersData];
-        if (value === 'count-desc') {
-          sortedOwners.sort((a, b) => b.count - a.count);
-        } else if (value === 'count-asc') {
-          sortedOwners.sort((a, b) => a.count - b.count);
-        } else if (value === 'name-asc') {
-          sortedOwners.sort((a, b) => a.name.localeCompare(b.name));
-        } else if (value === 'name-desc') {
-          sortedOwners.sort((a, b) => b.name.localeCompare(b.name));
-        }
-        const globalOwnersUl = document.getElementById('global-owners');
-        globalOwnersUl.innerHTML = sortedOwners.map(owner => `
-          <li ${owner.rank ? `style="color: ${owner.rank === 'gold' ? 'gold' : owner.rank === 'silver' ? 'silver' : '#cd7f32'}; font-weight: bold;"` : ''}>
-            <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
-            ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
-          </li>
-        `).join('');
+// Gestion du tri
+const sortSelect = document.getElementById('sortSelect');
+sortSelect.addEventListener('change', () => {
+  const value = sortSelect.value;
+  const sortedOwners = [...globalOwnersData];
+  if (value === 'count-desc') {
+    sortedOwners.sort((a, b) => b.count - a.count);
+  } else if (value === 'count-asc') {
+    sortedOwners.sort((a, b) => a.count - b.count);
+  } else if (value === 'name-asc') {
+    sortedOwners.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (value === 'name-desc') {
+    sortedOwners.sort((a, b) => b.name.localeCompare(a.name)); // Correction ici
+  }
+  const globalOwnersUl = document.getElementById('global-owners');
+  globalOwnersUl.innerHTML = sortedOwners.map(owner => `
+    <li ${owner.rank ? `style="color: ${owner.rank === 'gold' ? 'gold' : owner.rank === 'silver' ? 'silver' : '#cd7f32'}; font-weight: bold;"` : ''}>
+      <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
+      ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
+    </li>
+  `).join('');
 
-        // Réappliquer le filtrage après le tri si un terme de recherche existe
-        const filter = searchInput.value.toLowerCase();
-        if (filter) {
-          const listItems = globalOwnersUl.querySelectorAll('li');
-          let found = false;
-          listItems.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            const match = text.includes(filter);
-            item.style.display = match ? '' : 'none';
-            if (match) found = true;
-          });
-          const noResults = document.getElementById('no-results');
-          if (!found) {
-            if (!noResults) {
-              const msg = document.createElement('li');
-              msg.id = 'no-results';
-              msg.textContent = 'No results found';
-              msg.style.color = 'gray';
-              globalOwnersUl.appendChild(msg);
-            }
-          } else if (noResults) {
-            noResults.remove();
-          }
-        }
-      });
+  // Réappliquer le filtrage après le tri si un terme de recherche existe
+  const filter = searchInput.value.toLowerCase();
+  if (filter) {
+    const listItems = globalOwnersUl.querySelectorAll('li');
+    let found = false;
+    listItems.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      const match = text.includes(filter);
+      item.style.display = match ? '' : 'none';
+      if (match) found = true;
+    });
+    const noResults = document.getElementById('no-results');
+    if (!found) {
+      if (!noResults) {
+        const msg = document.createElement('li');
+        msg.id = 'no-results';
+        msg.textContent = 'No results found';
+        msg.style.color = 'gray';
+        globalOwnersUl.appendChild(msg);
+      }
+    } else if (noResults) {
+      noResults.remove();
+    }
+  }
+});
     });
   </script>
 </body>
