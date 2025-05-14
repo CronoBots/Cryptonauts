@@ -365,7 +365,7 @@
             <ul>
               ${collection.owners.map(owner => `
                 <li ${owner.rank ? `style="color: ${owner.rank === 'gold' ? 'gold' : owner.rank === 'silver' ? 'silver' : '#cd7f32'}; font-weight: bold;"` : ''}>
-                  <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} CRYPTONAUTS
+                  <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
                   ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
                 </li>
               `).join('')}
@@ -394,7 +394,7 @@
           <ul id="global-owners">
             ${owners.map(owner => `
               <li ${owner.rank ? `style="color: ${owner.rank === 'gold' ? 'gold' : owner.rank === 'silver' ? 'silver' : '#cd7f32'}; font-weight: bold;"` : ''}>
-                <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} CRYPTONAUTS
+                <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
                 ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
               </li>
             `).join('')}
@@ -470,7 +470,7 @@
           if (!noResults) {
             const msg = document.createElement('li');
             msg.id = 'no-results';
-            msg.textContent = 'NO RESULTS FOUND';
+            msg.textContent = 'No results found';
             msg.style.color = 'gray';
             document.getElementById('global-owners').appendChild(msg);
           }
@@ -496,10 +496,35 @@
         const globalOwnersUl = document.getElementById('global-owners');
         globalOwnersUl.innerHTML = sortedOwners.map(owner => `
           <li ${owner.rank ? `style="color: ${owner.rank === 'gold' ? 'gold' : owner.rank === 'silver' ? 'silver' : '#cd7f32'}; font-weight: bold;"` : ''}>
-            <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} CRYPTONAUTS
+            <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
             ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
           </li>
         `).join('');
+
+        // Réappliquer le filtrage après le tri si un terme de recherche existe
+        const filter = searchInput.value.toLowerCase();
+        if (filter) {
+          const listItems = globalOwnersUl.querySelectorAll('li');
+          let found = false;
+          listItems.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            const match = text.includes(filter);
+            item.style.display = match ? '' : 'none';
+            if (match) found = true;
+          });
+          const noResults = document.getElementById('no-results');
+          if (!found) {
+            if (!noResults) {
+              const msg = document.createElement('li');
+              msg.id = 'no-results';
+              msg.textContent = 'No results found';
+              msg.style.color = 'gray';
+              globalOwnersUl.appendChild(msg);
+            }
+          } else if (noResults) {
+            noResults.remove();
+          }
+        }
       });
     });
   </script>
