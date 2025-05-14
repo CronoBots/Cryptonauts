@@ -7,11 +7,12 @@
   <link rel="preload" href="Geomanist-Bold.otf" as="font" type="font/otf" crossorigin="anonymous">
   <style>
     :root {
-      --primary-color: #66bfff; /* Restauré à l'original */
+      --primary-color: #66bfff;
       --background-dark: #000;
       --text-dark: #fff;
-      --collection-bg: #1a1a1a; /* Restauré pour les "bulles" */
-      --shadow: 0 2px 4px rgba(255,255,255,0.1); /* Restauré pour les "bulles" */
+      --text-light: #000; /* Noir pour texte en mode clair */
+      --collection-bg: #1a1a1a;
+      --shadow: 0 2px 4px rgba(255,255,255,0.1);
     }
 
     @font-face {
@@ -34,17 +35,17 @@
 
     body.light-mode {
       background-color: #f5f5f5;
-      color: #333;
+      color: var(--text-light);
     }
 
     h1, h2, h3 {
       color: var(--text-dark);
-      text-transform: uppercase;
-      font-weight: 700;
     }
 
-    h2 {
-      font-size: 2rem;
+    body.light-mode h1,
+    body.light-mode h2,
+    body.light-mode h3 {
+      color: var(--text-light);
     }
 
     ul {
@@ -65,7 +66,17 @@
 
     body.light-mode .collection ul li::before,
     body.light-mode #global-owners li::before {
-      color: #333;
+      color: var(--text-dark); /* Blanc dans les "bulles" */
+    }
+
+    .collection ul li,
+    #global-owners li {
+      color: var(--text-dark);
+    }
+
+    body.light-mode .collection ul li,
+    body.light-mode #global-owners li {
+      color: var(--text-dark); /* Blanc dans les "bulles" */
     }
 
     a {
@@ -164,7 +175,7 @@
     }
 
     body.light-mode .theme-toggle {
-      color: #333;
+      color: var(--text-light);
     }
 
     .footer {
@@ -184,7 +195,7 @@
     }
 
     body.light-mode .footer-content {
-      color: #333;
+      color: var(--text-light);
     }
 
     .rank-gold {
@@ -222,6 +233,12 @@
         gap: 5px;
       }
     }
+
+    @media screen and (min-width: 601px) {
+      #searchInput, #sortSelect {
+        width: 200px; /* Largeur plus courte sur PC */
+      }
+    }
   </style>
 </head>
 <body>
@@ -250,6 +267,7 @@
         title: "Legendary Cryptonauts",
         image: "Legend.png",
         alt: "Legendary Cryptonauts Collection Icon",
+        member: "Yash Taneja",
         date: "SUMMER 2025",
         ownersCount: 0,
         owners: [],
@@ -259,6 +277,7 @@
         title: "TIME TRAVEL Cryptonauts",
         image: "https://media.nft.crypto.com/3f03eae4-d4db-4ec8-96cd-ff53a95403d0/original.jpg?d=lg-logo5",
         alt: "TIME TRAVEL Cryptonauts Collection Icon",
+        member: "KILL3R-WH4L3",
         ownersCount: 107,
         owners: [
           { name: "tohmee110", url: "https://crypto.com/nft/profile/tohmee110", count: 32, rank: "gold" },
@@ -329,7 +348,6 @@
           { name: "jamus0", url: "https://crypto.com/nft/profile/jamus0", count: 1 },
           { name: "kidprocro", url: "https://crypto.com/nft/profile/kidprocro", count: 1 },
           { name: "amondias83", url: "https://crypto.com/nft/profile/amondias83", count: 1 },
-          { name: "onmyalnus", url: "https://crypto.com/nft/profile/amondias83", count: 1 },
           { name: "onmywayup1", url: "https://crypto.com/nft/profile/onmywayup1", count: 1 },
         ],
       },
@@ -420,7 +438,7 @@
         <div class="summary">
           <h2>Total Owners: 623</h2>
           <input type="text" id="searchInput" placeholder="Search owner..." aria-label="Search owners">
-          <select id="sortSelect" aria-label=" privéesSort owners">
+          <select id="sortSelect" aria-label="Sort owners">
             <option value="count-desc">Sort by Count (High to Low)</option>
             <option value="count-asc">Sort by Count (Low to High)</option>
             <option value="name-asc">Sort by Name (A-Z)</option>
