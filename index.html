@@ -6,24 +6,39 @@
   <title>Cryptonauts Leaderboards</title>
   <link rel="preload" href="Geomanist-Bold.otf" as="font" type="font/otf" crossorigin="anonymous">
   <style>
+    :root {
+      --primary-color: #66bfff; /* Restauré à l'original */
+      --background-dark: #000;
+      --text-dark: #fff;
+      --collection-bg: #1a1a1a; /* Restauré pour les "bulles" */
+      --shadow: 0 2px 4px rgba(255,255,255,0.1); /* Restauré pour les "bulles" */
+    }
+
     @font-face {
       font-family: 'Geomanist-Bold';
       src: url('Geomanist-Bold.otf') format('opentype');
       font-weight: normal;
       font-style: normal;
+      font-display: swap;
     }
 
     body {
       font-family: 'Geomanist-Bold', sans-serif;
       line-height: 1.6;
       margin: 0;
-      background-color: #000;
-      color: #fff;
+      background-color: var(--background-dark);
+      color: var(--text-dark);
       padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.light-mode {
+      background-color: #f5f5f5;
+      color: #333;
     }
 
     h1, h2, h3 {
-      color: #fff;
+      color: var(--text-dark);
       text-transform: uppercase;
       font-weight: 700;
     }
@@ -41,16 +56,20 @@
       margin-bottom: 5px;
     }
 
-    /* Règle pour les "•" blancs */
     .collection ul li::before,
     #global-owners li::before {
       content: '•';
-      color: #fff;
+      color: var(--text-dark);
       margin-right: 8px;
     }
 
+    body.light-mode .collection ul li::before,
+    body.light-mode #global-owners li::before {
+      color: #333;
+    }
+
     a {
-      color: #66b0ff;
+      color: var(--primary-color);
       text-decoration: none;
     }
 
@@ -73,9 +92,9 @@
     .collection {
       margin-bottom: 20px;
       padding: 15px;
-      background-color: #1a1a1a;
+      background-color: var(--collection-bg);
       border-radius: 15px;
-      box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
     }
 
     .collection-header {
@@ -99,7 +118,7 @@
 
     .toggle-btn {
       cursor: pointer;
-      color: #66b0ff;
+      color: var(--primary-color);
       padding: 5px 10px;
       font-weight: 700;
       text-transform: uppercase;
@@ -120,18 +139,32 @@
 
     .summary {
       padding: 20px;
-      background-color: #1a1a1a;
+      background-color: var(--collection-bg);
       border-radius: 15px;
-      box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
     }
 
-    #searchInput {
+    #searchInput, #sortSelect {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
       border-radius: 8px;
       border: none;
       font-size: 16px;
+    }
+
+    .theme-toggle {
+      padding: 8px 16px;
+      background-color: var(--primary-color);
+      color: var(--text-dark);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Geomanist-Bold', sans-serif;
+    }
+
+    body.light-mode .theme-toggle {
+      color: #333;
     }
 
     .footer {
@@ -147,7 +180,26 @@
       flex-wrap: wrap;
       justify-content: center;
       font-size: 15px;
-      color: #ffffff;
+      color: var(--text-dark);
+    }
+
+    body.light-mode .footer-content {
+      color: #333;
+    }
+
+    .rank-gold {
+      color: gold;
+      font-weight: bold;
+    }
+
+    .rank-silver {
+      color: silver;
+      font-weight: bold;
+    }
+
+    .rank-bronze {
+      color: #cd7f32;
+      font-weight: bold;
     }
 
     @media screen and (max-width: 600px) {
@@ -171,8 +223,257 @@
       }
     }
   </style>
+</head>
+<body>
+  <header>
+    <img src="Header.jpg" alt="Cryptonauts Leaderboard Header Banner">
+  </header>
+  
+  <main>
+    <section class="collection-list">
+      <h1>Collections</h1>
+      <div id="collections"></div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="footer-content">
+      <div>CRONOBOTS | CRONOS DEVELOPMENT</div>
+      <button class="theme-toggle" aria-label="Toggle light/dark mode">Toggle Theme</button>
+    </div>
+  </footer>
+
   <script>
+    // Données des collections
+    const collectionsData = [
+      {
+        id: "legendary",
+        title: "Legendary Cryptonauts",
+        image: "Legend.png",
+        alt: "Legendary Cryptonauts Collection Icon",
+        member: "Yash Taneja",
+        date: "SUMMER 2025",
+        ownersCount: 0,
+        owners: [],
+      },
+      {
+        id: "collection-0",
+        title: "TIME TRAVEL Cryptonauts",
+        image: "https://media.nft.crypto.com/3f03eae4-d4db-4ec8-96cd-ff53a95403d0/original.jpg?d=lg-logo5",
+        alt: "TIME TRAVEL Cryptonauts Collection Icon",
+        member: "KILL3R-WH4L3",
+        ownersCount: 107,
+        owners: [
+          { name: "tohmee110", url: "https://crypto.com/nft/profile/tohmee110", count: 32, rank: "gold" },
+          { name: "jamus0", url: "https://crypto.com/nft/profile/jamus0", count: 28, rank: "silver" },
+          { name: "ethorne77", url: "https://crypto.com/nft/profile/ethorne77", count: 27, rank: "bronze" },
+          { name: "wisdomskingdom91", url: "https://crypto.com/nft/profile/wisdomskingdom91", count: 22 },
+          { name: "cryptocomnft19", url: "https://crypto.com/nft/profile/cryptocomnft19", count: 17 },
+          { name: "amondias83", url: "https://crypto.com/nft/profile/amondias83", count: 14 },
+        ],
+      },
+      {
+        id: "collection-1",
+        title: "Quantum Cryptonauts V2",
+        image: "https://media.nft.crypto.com/c19a171b-0418-4eb2-b3c1-1dcb84616c52/original.jpg?d=lg-logo",
+        alt: "Quantum Cryptonauts V2 Collection Icon",
+        ownersCount: 73,
+        owners: [
+          { name: "noleaster", url: "https://crypto.com/nft/profile/noleaster", count: 17, rank: "gold" },
+          { name: "amondias83", url: "https://crypto.com/nft/profile/amondias83", count: 13, rank: "silver" },
+          { name: "ethorne77", url: "https://crypto.com/nft/profile/ethorne77", count: 13, rank: "bronze" },
+          { name: "onmywayup1", url: "https://crypto.com/nft/profile/onmywayup1", count: 9 },
+          { name: "nft_master_goat", url: "https://crypto.com/nft/profile/nft_master_goat", count: 9 },
+          { name: "ndaconstruct021", url: "https://crypto.com/nft/profile/ndaconstruct021", count: 9 },
+        ],
+      },
+      {
+        id: "collection-2",
+        title: "Quantum Cryptonauts",
+        image: "https://media.nft.crypto.com/395953dd-72fe-49ba-acb0-f638166b87ae/original.jpg?d=lg-logo",
+        alt: "Quantum Cryptonauts Collection Icon",
+        ownersCount: 108,
+        owners: [
+          { name: "onmywayup1", url: "https://crypto.com/nft/profile/onmywayup1", count: 47, rank: "gold" },
+          { name: "mikezx1200", url: "https://crypto.com/nft/profile/mikezx1200", count: 23, rank: "silver" },
+          { name: "wisdomskingdom91", url: "https://crypto.com/nft/profile/wisdomskingdom91", count: 14, rank: "bronze" },
+          { name: "adriserpico", url: "https://crypto.com/nft/profile/adriserpico", count: 14 },
+          { name: "noleaster", url: "https://crypto.com/nft/profile/noleaster", count: 14 },
+          { name: "cryptocomnft19", url: "https://crypto.com/nft/profile/cryptocomnft19", count: 12 },
+        ],
+      },
+      {
+        id: "collection-3",
+        title: "Cryptonauts 2024",
+        image: "https://media.nft.crypto.com/84f5f042-7cb0-404f-88d2-43d07a6d2a46/original.jpg?d=lg-logo",
+        alt: "Cryptonauts 2024 Collection Icon",
+        ownersCount: 148,
+        owners: [
+          { name: "stackse215", url: "https://crypto.com/nft/profile/stackse215", count: 14, rank: "gold" },
+          { name: "hazekrwlng094", url: "https://crypto.com/nft/profile/hazekrwlng094", count: 12, rank: "silver" },
+          { name: "frflooring", url: "https://crypto.com/nft/profile/frflooring", count: 12, rank: "bronze" },
+          { name: "rymoreason", url: "https://crypto.com/nft/profile/rymoreason", count: 12 },
+          { name: "liz_trevino53587", url: "https://crypto.com/nft/profile/liz_trevino53587", count: 10 },
+          { name: "gringotwinkie", url: "https://crypto.com/nft/profile/gringotwinkie", count: 6 },
+        ],
+      },
+      {
+        id: "collection-4",
+        title: "Cryptonauts Golden Crew",
+        image: "https://media.nft.crypto.com/6d6e7a76-35f6-4918-b851-ddebabf94e2c/original.jpg?d=lg-logo",
+        alt: "Cryptonauts Golden Crew Collection Icon",
+        ownersCount: 9,
+        owners: [
+          { name: "cabezaenlasnubes", url: "https://crypto.com/nft/profile/cabezaenlasnubes", count: 3, rank: "gold" },
+          { name: "ben__crypto23", url: "https://crypto.com/nft/profile/ben__crypto23", count: 2, rank: "silver" },
+          { name: "ethorne77", url: "https://crypto.com/nft/profile/ethorne77", count: 1, rank: "bronze" },
+          { name: "omgwtf", url: "https://crypto.com/nft/profile/omgwtf", count: 1 },
+          { name: "chionna", url: "https://crypto.com/nft/profile/chionna", count: 1 },
+          { name: "jamus0", url: "https://crypto.com/nft/profile/jamus0", count: 1 },
+          { name: "kidprocro", url: "https://crypto.com/nft/profile/kidprocro", count: 1 },
+          { name: "amondias83", url: "https://crypto.com/nft/profile/amondias83", count: 1 },
+          { name: "onmyalnus", url: "https://crypto.com/nft/profile/amondias83", count: 1 },
+          { name: "onmywayup1", url: "https://crypto.com/nft/profile/onmywayup1", count: 1 },
+        ],
+      },
+      {
+        id: "collection-5",
+        title: "Cryptonauts: The dark side of the dune",
+        image: "https://media.nft.crypto.com/f3bdf36b-403b-4799-a39f-2c21cea5dc99/original.jpg?d=lg-logo",
+        alt: "Cryptonauts: The dark side of the dune Collection Icon",
+        ownersCount: 126,
+        owners: [
+          { name: "echotpull050", url: "https://crypto.com/nft/profile/echotpull050", count: 15, rank: "gold" },
+          { name: "drewcotton70", url: "https://crypto.com/nft/profile/drewcotton70", count: 10, rank: "silver" },
+          { name: "euphoricsalvia", url: "https://crypto.com/nft/profile/euphoricsalvia", count: 9, rank: "bronze" },
+          { name: "aquacoin", url: "https://crypto.com/nft/profile/aquacoin", count: 8 },
+          { name: "santa61", url: "https://crypto.com/nft/profile/santa61", count: 7 },
+          { name: "stackse215", url: "https://crypto.com/nft/profile/stackse215", count: 7 },
+        ],
+      },
+      {
+        id: "collection-6",
+        title: "Cryptonauts",
+        image: "https://media.nft.crypto.com/5057c430-e7f5-4462-a6d2-7bb2bfb68700/original.jpg?d=lg-logo",
+        alt: "Cryptonauts Collection Icon",
+        ownersCount: 225,
+        owners: [
+          { name: "santa61", url: "https://crypto.com/nft/profile/santa61", count: 19, rank: "gold" },
+          { name: "onmywayup1", url: "https://crypto.com/nft/profile/onmywayup1", count: 13, rank: "silver" },
+          { name: "vault_327", url: "https://crypto.com/nft/profile/vault_327", count: 9, rank: "bronze" },
+          { name: "cyberpaw", url: "https://crypto.com/nft/profile/cyberpaw", count: 8 },
+          { name: "pushmedia", url: "https://crypto.com/nft/profile/pushmedia", count: 7 },
+          { name: "siguenzamc3", url: "https://crypto.com/nft/profile/siguenzamc3", count: 7 },
+        ],
+      },
+    ];
+
+    // Données des propriétaires globaux
+    const globalOwnersData = [
+      { name: "onmywayup1", url: "https://crypto.com/nft/profile/onmywayup1", count: 79, rank: "gold" },
+      { name: "ethorne77", url: "https://crypto.com/nft/profile/ethorne77", count: 43, rank: "silver" },
+      { name: "jamus0", url: "https://crypto.com/nft/profile/jamus0", count: 36, rank: "bronze" },
+      { name: "wisdomskingdom91", url: "https://crypto.com/nft/profile/wisdomskingdom91", count: 36 },
+      { name: "tohmee110", url: "https://crypto.com/nft/profile/tohmee110", count: 35 },
+      { name: "rymoreason", url: "https://crypto.com/nft/profile/rymoreason", count: 33 },
+    ];
+
+    // Validation des URLs
+    function validateUrl(url) {
+      return url.startsWith('https://crypto.com/nft/profile/') ? url : '#';
+    }
+
+    // Générer une collection
+    function renderCollection(collection) {
+      const div = document.createElement('div');
+      div.className = 'collection';
+      div.innerHTML = `
+        <div class="collection-header">
+          <img src="${collection.image}" alt="${collection.alt}" class="collection-image">
+          <div class="title-container">
+            <h2>${collection.title}</h2>
+            ${collection.date ? `<span style="color: #cc8834; font-weight: 700; margin-top: 8px;">${collection.date}</span>` : ''}
+            ${collection.member ? `<span style="color: var(--text-dark); font-weight: 700; margin-left: 8px;">${collection.member}</span>` : ''}
+            ${collection.owners.length ? `<span class="toggle-btn" data-section-id="${collection.id}" aria-controls="${collection.id}" aria-expanded="false" aria-label="Toggle ${collection.title} owners">Show owners</span>` : ''}
+          </div>
+        </div>
+        ${collection.owners.length ? `
+          <div id="${collection.id}" class="hidden">
+            <h3>OWNERS: ${collection.ownersCount}</h3>
+            <ul>
+              ${collection.owners.map(owner => `
+                <li ${owner.rank ? `class="rank-${owner.rank}"` : ''}>
+                  <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
+                  ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        ` : ''}
+      `;
+      return div;
+    }
+
+    // Générer le récapitulatif
+    function renderGlobalOwners(owners) {
+      const section = document.createElement('section');
+      section.className = 'leaderboard-section';
+      section.innerHTML = `
+        <h1>Leaderboards</h1>
+        <div class="summary">
+          <h2>Total Owners: 623</h2>
+          <input type="text" id="searchInput" placeholder="Search owner..." aria-label="Search owners">
+          <select id="sortSelect" aria-label=" privéesSort owners">
+            <option value="count-desc">Sort by Count (High to Low)</option>
+            <option value="count-asc">Sort by Count (Low to High)</option>
+            <option value="name-asc">Sort by Name (A-Z)</option>
+            <option value="name-desc">Sort by Name (Z-A)</option>
+          </select>
+          <ul id="global-owners">
+            ${owners.map(owner => `
+              <li ${owner.rank ? `class="rank-${owner.rank}"` : ''}>
+                <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
+                ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `;
+      return section;
+    }
+
+    // Débouncing
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    // Initialisation
     document.addEventListener('DOMContentLoaded', () => {
+      const collectionsContainer = document.getElementById('collections');
+      const main = document.querySelector('main');
+
+      // Valider les URLs
+      collectionsData.forEach(collection => {
+        collection.owners.forEach(owner => {
+          owner.url = validateUrl(owner.url);
+        });
+      });
+      globalOwnersData.forEach(owner => {
+        owner.url = validateUrl(owner.url);
+      });
+
+      // Rendre les collections
+      collectionsData.forEach(collection => {
+        collectionsContainer.appendChild(renderCollection(collection));
+      });
+
+      // Rendre le récapitulatif
+      main.appendChild(renderGlobalOwners(globalOwnersData));
+
+      // Gestion des boutons de bascule
       const toggleButtons = document.querySelectorAll('.toggle-btn');
       toggleButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -181,15 +482,16 @@
           if (section) {
             const isHidden = section.classList.contains('hidden');
             section.classList.toggle('hidden', !isHidden);
-            button.textContent = isHidden ? 'HIDE' : 'SHOW';
+            button.textContent = isHidden ? 'Hide owners' : 'Show owners';
             button.setAttribute('aria-expanded', isHidden);
           }
         });
       });
 
+      // Gestion de la recherche
       const searchInput = document.getElementById('searchInput');
       const listItems = document.querySelectorAll('#global-owners li');
-      searchInput.addEventListener('input', () => {
+      searchInput.addEventListener('input', debounce(() => {
         const filter = searchInput.value.toLowerCase();
         let found = false;
         listItems.forEach(item => {
@@ -210,199 +512,38 @@
         } else {
           if (noResults) noResults.remove();
         }
+      }, 300));
+
+      // Gestion du tri
+      const sortSelect = document.getElementById('sortSelect');
+      sortSelect.addEventListener('change', () => {
+        const value = sortSelect.value;
+        const sortedOwners = [...globalOwnersData];
+        if (value === 'count-desc') {
+          sortedOwners.sort((a, b) => b.count - a.count);
+        } else if (value === 'count-asc') {
+          sortedOwners.sort((a, b) => a.count - b.count);
+        } else if (value === 'name-asc') {
+          sortedOwners.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (value === 'name-desc') {
+          sortedOwners.sort((a, b) => b.name.localeCompare(a.name));
+        }
+        const globalOwnersUl = document.getElementById('global-owners');
+        globalOwnersUl.innerHTML = sortedOwners.map(owner => `
+          <li ${owner.rank ? `class="rank-${owner.rank}"` : ''}>
+            <a href="${validateUrl(owner.url)}" target="_blank" rel="noopener noreferrer">${owner.name}</a> : ${owner.count} Cryptonauts
+            ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
+          </li>
+        `).join('');
+      });
+
+      // Gestion du mode sombre/clair
+      const themeToggle = document.querySelector('.theme-toggle');
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        themeToggle.textContent = document.body.classList.contains('light-mode') ? 'Dark Mode' : 'Light Mode';
       });
     });
   </script>
-</head>
-<body>
-  <header>
-    <img src="Header.jpg" alt="Header Image">
-  </header>
-  
-  <main>
-    <section class="collection-list">
-      <h1>Collections</h1>
-      <div class="collection">
-        <div class="collection-header">
-          <img src="Legend.png" alt="Legendary Cryptonauts" class="collection-image">
-          <div class="title-container">
-            <h2>Legendary Cryptonauts</h2>
-            <span style="color: #cc8834; font-weight: 700; margin-top: 8px;">SUMMER 2025</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="collection">
-        <div class="collection-header">
-          <img src="https://media.nft.crypto.com/3f03eae4-d4db-4ec8-96cd-ff53a95403d0/original.jpg?d=lg-logo5" alt="TIME TRAVEL" class="collection-image">
-          <div class="title-container">
-            <h2>TIME TRAVEL Cryptonauts</h2>
-            <span class="toggle-btn" data-section-id="collection-0">SHOW</span>
-          </div>
-        </div>
-        <div id="collection-0" class="hidden">
-          <h3>OWNERS: 107</h3>
-          <ul>
-            <li style="color: gold; font-weight: bold;"><a href="https://crypto.com/nft/profile/tohmee110" target="_blank" rel="noopener noreferrer">tohmee110</a> : 32 Cryptonauts 🥇</li>
-            <li style="color: silver; font-weight: bold;"><a href="https://crypto.com/nft/profile/jamus0" target="_blank" rel="noopener noreferrer">jamus0</a> : 28 Cryptonauts 🥈</li>
-            <li style="color: #cd7f32; font-weight: bold;"><a href="https://crypto.com/nft/profile/ethorne77" target="_blank" rel="noopener noreferrer">ethorne77</a> : 27 Cryptonauts 🥉</li>
-            <li><a href="https://crypto.com/nft/profile/wisdomskingdom91" target="_blank" rel="noopener noreferrer">wisdomskingdom91</a> : 22 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/cryptocomnft19" target="_blank" rel="noopener noreferrer">cryptocomnft19</a> : 17 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/amondias83" target="_blank" rel="noopener noreferrer">amondias83</a> : 14 Cryptonauts</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="collection">
-        <div class="collection-header">
-          <img src="https://media.nft.crypto.com/c19a171b-0418-4eb2-b3c1-1dcb84616c52/original.jpg?d=lg-logo" alt="Quantum V2" class="collection-image">
-          <div class="title-container">
-            <h2>Quantum Cryptonauts V2</h2>
-            <span class="toggle-btn" data-section-id="collection-1">SHOW</span>
-          </div>
-        </div>
-        <div id="collection-1" class="hidden">
-          <h3>OWNERS: 73</h3>
-          <ul>
-            <li style="color: gold; font-weight: bold;"><a href="https://crypto.com/nft/profile/noleaster" target="_blank" rel="noopener noreferrer">noleaster</a> : 17 Cryptonauts 🥇</li>
-            <li style="color: silver; font-weight: bold;"><a href="https://crypto.com/nft/profile/amondias83" target="_blank" rel="noopener noreferrer">amondias83</a> : 13 Cryptonauts 🥈</li>
-            <li style="color: #cd7f32; font-weight: bold;"><a href="https://crypto.com/nft/profile/ethorne77" target="_blank" rel="noopener noreferrer">ethorne77</a> : 13 Cryptonauts 🥉</li>
-            <li><a href="https://crypto.com/nft/profile/onmywayup1" target="_blank" rel="noopener noreferrer">onmywayup1</a> : 9 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/nft_master_goat" target="_blank" rel="noopener noreferrer">nft_master_goat</a> : 9 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/ndaconstruct021" target="_blank" rel="noopener noreferrer">ndaconstruct021</a> : 9 Cryptonauts</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="collection">
-        <div class="collection-header">
-          <img src="https://media.nft.crypto.com/395953dd-72fe-49ba-acb0-f638166b87ae/original.jpg?d=lg-logo" alt="Quantum" class="collection-image">
-          <div class="title-container">
-            <h2>Quantum Cryptonauts</h2>
-            <span class="toggle-btn" data-section-id="collection-2">SHOW</span>
-          </div>
-        </div>
-        <div id="collection-2" class="hidden">
-          <h3>OWNERS: 108</h3>
-          <ul>
-            <li style="color: gold; font-weight: bold;"><a href="https://crypto.com/nft/profile/onmywayup1" target="_blank" rel="noopener noreferrer">onmywayup1</a> : 47 Cryptonauts 🥇</li>
-            <li style="color: silver; font-weight: bold;"><a href="https://crypto.com/nft/profile/mikezx1200" target="_blank" rel="noopener noreferrer">mikezx1200</a> : 23 Cryptonauts 🥈</li>
-            <li style="color: #cd7f32; font-weight: bold;"><a href="https://crypto.com/nft/profile/wisdomskingdom91" target="_blank" rel="noopener noreferrer">wisdomskingdom91</a> : 14 Cryptonauts 🥉</li>
-            <li><a href="https://crypto.com/nft/profile/adriserpico" target="_blank" rel="noopener noreferrer">adriserpico</a> : 14 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/noleaster" target="_blank" rel="noopener noreferrer">noleaster</a> : 14 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/cryptocomnft19" target="_blank" rel="noopener noreferrer">cryptocomnft19</a> : 12 Cryptonauts</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="collection">
-        <div class="collection-header">
-          <img src="https://media.nft.crypto.com/84f5f042-7cb0-404f-88d2-43d07a6d2a46/original.jpg?d=lg-logo" alt="2024" class="collection-image">
-          <div class="title-container">
-            <h2>Cryptonauts 2024</h2>
-            <span class="toggle-btn" data-section-id="collection-3">SHOW</span>
-          </div>
-        </div>
-        <div id="collection-3" class="hidden">
-          <h3>OWNERS: 148</h3>
-          <ul>
-            <li style="color: gold; font-weight: bold;"><a href="https://crypto.com/nft/profile/stackse215" target="_blank" rel="noopener noreferrer">stackse215</a> : 14 Cryptonauts 🥇</li>
-            <li style="color: silver; font-weight: bold;"><a href="https://crypto.com/nft/profile/hazekrwlng094" target="_blank" rel="noopener noreferrer">hazekrwlng094</a> : 12 Cryptonauts 🥈</li>
-            <li style="color: #cd7f32; font-weight: bold;"><a href="https://crypto.com/nft/profile/frflooring" target="_blank" rel="noopener noreferrer">frflooring</a> : 12 Cryptonauts 🥉</li>
-            <li><a href="https://crypto.com/nft/profile/rymoreason" target="_blank" rel="noopener noreferrer">rymoreason</a> : 12 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/liz_trevino53587" target="_blank" rel="noopener noreferrer">liz_trevino53587</a> : 10 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/gringotwinkie" target="_blank" rel="noopener noreferrer">gringotwinkie</a> : 6 Cryptonauts</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="collection">
-        <div class="collection-header">
-          <img src="https://media.nft.crypto.com/6d6e7a76-35f6-4918-b851-ddebabf94e2c/original.jpg?d=lg-logo" alt="Golden Crew" class="collection-image">
-          <div class="title-container">
-            <h2>Cryptonauts Golden Crew</h2>
-            <span class="toggle-btn" data-section-id="collection-4">SHOW</span>
-          </div>
-        </div>
-        <div id="collection-4" class="hidden">
-          <h3>OWNERS: 9</h3>
-          <ul>
-            <li style="color: gold; font-weight: bold;"><a href="https://crypto.com/nft/profile/cabezaenlasnubes" target="_blank" rel="noopener noreferrer">cabezaenlasnubes</a> : 3 Cryptonauts 🥇</li>
-            <li style="color: silver; font-weight: bold;"><a href="https://crypto.com/nft/profile/ben__crypto23" target="_blank" rel="noopener noreferrer">ben__crypto23</a> : 2 Cryptonauts 🥈</li>
-            <li style="color: #cd7f32; font-weight: bold;"><a href="https://crypto.com/nft/profile/ethorne77" target="_blank" rel="noopener noreferrer">ethorne77</a> : 1 Cryptonaut 🥉</li>
-            <li><a href="https://crypto.com/nft/profile/omgwtf" target="_blank" rel="noopener noreferrer">omgwtf</a> : 1 Cryptonaut</li>
-            <li><a href="https://crypto.com/nft/profile/chionna" target="_blank" rel="noopener noreferrer">chionna</a> : 1 Cryptonaut</li>
-            <li><a href="https://crypto.com/nft/profile/jamus0" target="_blank" rel="noopener noreferrer">jamus0</a> : 1 Cryptonaut</li>
-            <li><a href="https://crypto.com/nft/profile/kidprocro" target="_blank" rel="noopener noreferrer">kidprocro</a> : 1 Cryptonaut</li>
-            <li><a href="https://crypto.com/nft/profile/amondias83" target="_blank" rel="noopener noreferrer">amondias83</a> : 1 Cryptonaut</li>
-            <li><a href="https://crypto.com/nft/profile/onmywayup1" target="_blank" rel="noopener noreferrer">onmywayup1</a> : 1 Cryptonaut</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="collection">
-        <div class="collection-header">
-          <img src="https://media.nft.crypto.com/f3bdf36b-403b-4799-a39f-2c21cea5dc99/original.jpg?d=lg-logo" alt="Dark Side" class="collection-image">
-          <div class="title-container">
-            <h2>Cryptonauts: The dark side of the dune</h2>
-            <span class="toggle-btn" data-section-id="collection-5">SHOW</span>
-          </div>
-        </div>
-        <div id="collection-5" class="hidden">
-          <h3>OWNERS: 126</h3>
-          <ul>
-            <li style="color: gold; font-weight: bold;"><a href="https://crypto.com/nft/profile/echotpull050" target="_blank" rel="noopener noreferrer">echotpull050</a> : 15 Cryptonauts 🥇</li>
-            <li style="color: silver; font-weight: bold;"><a href="https://crypto.com/nft/profile/drewcotton70" target="_blank" rel="noopener noreferrer">drewcotton70</a> : 10 Cryptonauts 🥈</li>
-            <li style="color: #cd7f32; font-weight: bold;"><a href="https://crypto.com/nft/profile/euphoricsalvia" target="_blank" rel="noopener noreferrer">euphoricsalvia</a> : 9 Cryptonauts 🥉</li>
-            <li><a href="https://crypto.com/nft/profile/aquacoin" target="_blank" rel="noopener noreferrer">aquacoin</a> : 8 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/santa61" target="_blank" rel="noopener noreferrer">santa61</a> : 7 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/stackse215" target="_blank" rel="noopener noreferrer">stackse215</a> : 7 Cryptonauts</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="collection">
-        <div class="collection-header">
-          <img src="https://media.nft.crypto.com/5057c430-e7f5-4462-a6d2-7bb2bfb68700/original.jpg?d=lg-logo" alt="Cryptonauts" class="collection-image">
-          <div class="title-container">
-            <h2>Cryptonauts</h2>
-            <span class="toggle-btn" data-section-id="collection-6">SHOW</span>
-          </div>
-        </div>
-        <div id="collection-6" class="hidden">
-          <h3>OWNERS: 225</h3>
-          <ul>
-            <li style="color: gold; font-weight: bold;"><a href="https://crypto.com/nft/profile/santa61" target="_blank" rel="noopener noreferrer">santa61</a> : 19 Cryptonauts 🥇</li>
-            <li style="color: silver; font-weight: bold;"><a href="https://crypto.com/nft/profile/onmywayup1" target="_blank" rel="noopener noreferrer">onmywayup1</a> : 13 Cryptonauts 🥈</li>
-            <li style="color: #cd7f32; font-weight: bold;"><a href="https://crypto.com/nft/profile/vault_327" target="_blank" rel="noopener noreferrer">vault_327</a> : 9 Cryptonauts 🥉</li>
-            <li><a href="https://crypto.com/nft/profile/cyberpaw" target="_blank" rel="noopener noreferrer">cyberpaw</a> : 8 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/pushmedia" target="_blank" rel="noopener noreferrer">pushmedia</a> : 7 Cryptonauts</li>
-            <li><a href="https://crypto.com/nft/profile/siguenzamc3" target="_blank" rel="noopener noreferrer">siguenzamc3</a> : 7 Cryptonauts</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="leaderboard-section">
-      <h1>Leaderboards</h1>
-      <div class="summary">
-        <h2>Total Owners: 623</h2>
-        <input type="text" id="searchInput" placeholder="Search owner...">
-        <ul id="global-owners">
-          <li style="color: gold; font-weight: bold;"><a href="https://crypto.com/nft/profile/onmywayup1" target="_blank" rel="noopener noreferrer">onmywayup1</a> : 79 Cryptonauts 🥇</li>
-          <li style="color: silver; font-weight: bold;"><a href="https://crypto.com/nft/profile/ethorne77" target="_blank" rel="noopener noreferrer">ethorne77</a> : 43 Cryptonauts 🥈</li>
-          <li style="color: #cd7f32; font-weight: bold;"><a href="https://crypto.com/nft/profile/jamus0" target="_blank" rel="noopener noreferrer">jamus0</a> : 36 Cryptonauts 🥉</li>
-          <li><a href="https://crypto.com/nft/profile/wisdomskingdom91" target="_blank" rel="noopener noreferrer">wisdomskingdom91</a> : 36 Cryptonauts</li>
-          <li><a href="https://crypto.com/nft/profile/tohmee110" target="_blank" rel="noopener noreferrer">tohmee110</a> : 35 Cryptonauts</li>
-          <li><a href="https://crypto.com/nft/profile/rymoreason" target="_blank" rel="noopener noreferrer">rymoreason</a> : 33 Cryptonauts</li>
-        </ul>
-      </div>
-    </section>
-  </main>
-  <footer class="footer">
-    <div class="footer-content">
-      <div>CRONOBOTS | CRONOS DEVELOPMENT</div>
-    </div>
-  </footer>
 </body>
 </html>
