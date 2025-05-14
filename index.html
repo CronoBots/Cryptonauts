@@ -10,7 +10,6 @@
       --primary-color: #66bfff;
       --background-dark: #000;
       --text-dark: #fff;
-      --text-light: #000;
       --collection-bg: #1a1a1a;
       --shadow: 0 2px 4px rgba(255,255,255,0.1);
     }
@@ -30,27 +29,16 @@
       background-color: var(--background-dark);
       color: var(--text-dark);
       padding: 20px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    body.light-mode {
-      background-color: #f5f5f5;
-      color: var(--text-light);
     }
 
     h1, h2, h3 {
       color: var(--text-dark);
+      text-transform: uppercase;
+      font-weight: 700;
     }
 
-    body.light-mode h1 {
-      color: var(--text-light);
-    }
-
-    .collection h2,
-    .collection h3,
-    .summary h2,
-    .summary h3 {
-      color: var(--text-dark);
+    h2 {
+      font-size: 2rem;
     }
 
     ul {
@@ -157,20 +145,7 @@
       border-radius: 8px;
       border: none;
       font-size: 16px;
-    }
-
-    .theme-toggle {
-      padding: 8px 16px;
-      background-color: var(--primary-color);
-      color: var(--text-dark);
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Geomanist-Bold', sans-serif;
-    }
-
-    body.light-mode .theme-toggle {
-      color: var(--text-light);
+      box-sizing: border-box;
     }
 
     .footer {
@@ -187,10 +162,6 @@
       justify-content: center;
       font-size: 15px;
       color: var(--text-dark);
-    }
-
-    body.light-mode .footer-content {
-      color: var(--text-light);
     }
 
     @media screen and (max-width: 600px) {
@@ -216,7 +187,7 @@
 
     @media screen and (min-width: 601px) {
       #searchInput, #sortSelect {
-        width: 200px;
+        width: 250px; /* Légère augmentation de 200px à 250px */
       }
     }
   </style>
@@ -235,7 +206,6 @@
   <footer class="footer">
     <div class="footer-content">
       <div>CRONOBOTS | CRONOS DEVELOPMENT</div>
-      <button class="theme-toggle" aria-label="Toggle light/dark mode">Toggle Theme</button>
     </div>
   </footer>
 
@@ -244,7 +214,7 @@
     const collectionsData = [
       {
         id: "legendary",
-        title: "Legendary Cryptonauts",
+        title: "LEGENDARY CRYPTONAUTS",
         image: "Legend.png",
         alt: "Legendary Cryptonauts Collection Icon",
         date: "SUMMER 2025",
@@ -253,7 +223,7 @@
       },
       {
         id: "collection-0",
-        title: "TIME TRAVEL Cryptonauts",
+        title: "TIME TRAVEL CRYPTONAUTS",
         image: "https://media.nft.crypto.com/3f03eae4-d4db-4ec8-96cd-ff53a95403d0/original.jpg?d=lg-logo5",
         alt: "TIME TRAVEL Cryptonauts Collection Icon",
         ownersCount: 107,
@@ -268,7 +238,7 @@
       },
       {
         id: "collection-1",
-        title: "Quantum Cryptonauts V2",
+        title: "QUANTUM CRYPTONAUTS V2",
         image: "https://media.nft.crypto.com/c19a171b-0418-4eb2-b3c1-1dcb84616c52/original.jpg?d=lg-logo",
         alt: "Quantum Cryptonauts V2 Collection Icon",
         ownersCount: 73,
@@ -283,7 +253,7 @@
       },
       {
         id: "collection-2",
-        title: "Quantum Cryptonauts",
+        title: "QUANTUM CRYPTONAUTS",
         image: "https://media.nft.crypto.com/395953dd-72fe-49ba-acb0-f638166b87ae/original.jpg?d=lg-logo",
         alt: "Quantum Cryptonauts Collection Icon",
         ownersCount: 108,
@@ -298,7 +268,7 @@
       },
       {
         id: "collection-3",
-        title: "Cryptonauts 2024",
+        title: "CRYPTONAUTS 2024",
         image: "https://media.nft.crypto.com/84f5f042-7cb0-404f-88d2-43d07a6d2a46/original.jpg?d=lg-logo",
         alt: "Cryptonauts 2024 Collection Icon",
         ownersCount: 148,
@@ -313,7 +283,7 @@
       },
       {
         id: "collection-4",
-        title: "Cryptonauts Golden Crew",
+        title: "CRYPTONAUTS GOLDEN CREW",
         image: "https://media.nft.crypto.com/6d6e7a76-35f6-4918-b851-ddebabf94e2c/original.jpg?d=lg-logo",
         alt: "Cryptonauts Golden Crew Collection Icon",
         ownersCount: 9,
@@ -331,7 +301,7 @@
       },
       {
         id: "collection-5",
-        title: "Cryptonauts: The dark side of the dune",
+        title: "CRYPTONAUTS: THE DARK SIDE OF THE DUNE",
         image: "https://media.nft.crypto.com/f3bdf36b-403b-4799-a39f-2c21cea5dc99/original.jpg?d=lg-logo",
         alt: "Cryptonauts: The dark side of the dune Collection Icon",
         ownersCount: 126,
@@ -346,7 +316,7 @@
       },
       {
         id: "collection-6",
-        title: "Cryptonauts",
+        title: "CRYPTONAUTS",
         image: "https://media.nft.crypto.com/5057c430-e7f5-4462-a6d2-7bb2bfb68700/original.jpg?d=lg-logo",
         alt: "Cryptonauts Collection Icon",
         ownersCount: 225,
@@ -411,9 +381,9 @@
       const section = document.createElement('section');
       section.className = 'leaderboard-section';
       section.innerHTML = `
-        <h1>Leaderboards</h1>
+        <h1>LEADERBOARDS</h1>
         <div class="summary">
-          <h2>Total Owners: 623</h2>
+          <h2>TOTAL OWNERS: 623</h2>
           <input type="text" id="searchInput" placeholder="Search owner..." aria-label="Search owners">
           <select id="sortSelect" aria-label="Sort owners">
             <option value="count-desc">Sort by Count (High to Low)</option>
@@ -528,13 +498,6 @@
             ${owner.rank === 'gold' ? '🥇' : owner.rank === 'silver' ? '🥈' : owner.rank === 'bronze' ? '🥉' : ''}
           </li>
         `).join('');
-      });
-
-      // Gestion du mode sombre/clair
-      const themeToggle = document.querySelector('.theme-toggle');
-      themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-        themeToggle.textContent = document.body.classList.contains('light-mode') ? 'Dark Mode' : 'Light Mode';
       });
     });
   </script>
