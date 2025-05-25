@@ -819,31 +819,61 @@
 
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
-          searchInput.addEventListener('input', debounce(() => {
-            const filter = searchInput.value.toLowerCase();
-            const listItems = document.querySelectorAll('#global-owners li, #additional-owners li');
-            let found = false;
+searchInput.addEventListener('input', debounce(() => {
+  const filter = searchInput.value.toLowerCase();
+  const globalOwnersItems = document.querySelectorAll('#global-owners li');
+  const additionalOwnersItems = document.querySelectorAll('#additional-owners li');
+  const showMoreButton = document.getElementById('show-more-owners');
+  const additionalOwners = document.getElementById('additional-owners');
+  let found = false;
 
-            listItems.forEach(item => {
-              const text = item.textContent.toLowerCase();
-              const match = text.includes(filter);
-              item.style.display = match ? '' : 'none';
-              if (match) found = true;
-            });
+  // Gérer les éléments dans global-owners
+  globalOwnersItems.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    const match = text.includes(filter);
+    item.style.display = match ? '' : 'none';
+    if (match) found = true;
+  });
 
-            const noResults = document.getElementById('no-results');
-            if (!found) {
-              if (!noResults) {
-                const msg = document.createElement('li');
-                msg.id = 'no-results';
-                msg.textContent = 'No results found';
-                msg.style.color = '#fff';
-                document.getElementById('global-owners').appendChild(msg);
-              }
-            } else if (noResults) {
-              noResults.remove();
-            }
-          }, 300));
+  // Gérer les éléments dans additional-owners
+  let foundInAdditional = false;
+  additionalOwnersItems.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    const match = text.includes(filter);
+    item.style.display = match ? '' : 'none';
+    if (match) {
+      found = true;
+      foundInAdditional = true;
+    }
+  });
+
+  // Si un résultat est trouvé dans additional-owners, afficher la section
+  if (foundInAdditional && additionalOwners && showMoreButton) {
+    additionalOwners.classList.remove('hidden');
+    showMoreButton.textContent = 'SHOW LESS';
+    showMoreButton.setAttribute('aria-expanded', 'true');
+  } else if (!foundInAdditional && additionalOwners && showMoreButton) {
+    // Si aucun résultat dans additional-owners, rétablir l'état initial si nécessaire
+    if (showMoreButton.getAttribute('aria-expanded') === 'false') {
+      additionalOwners.classList.add('hidden');
+      showMoreButton.textContent = 'SHOW MORE';
+    }
+  }
+
+  // Gérer le message "No results found"
+  const noResults = document.getElementById('no-results');
+  if (!found) {
+    if (!noResults) {
+      const msg = document.createElement('li');
+      msg.id = 'no-results';
+      msg.textContent = 'No results found';
+      msg.style.color = '#fff';
+      document.getElementById('global-owners').appendChild(msg);
+    }
+  } else if (noResults) {
+    noResults.remove();
+  }
+}, 300));
         }
       } catch (error) {
         console.error('Error in DOMContentLoaded handler:', error);
