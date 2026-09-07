@@ -64,8 +64,11 @@ Start-Job -Name "wd-$SessionName" -ArgumentList $SessionName, $logFile, $PID -Sc
     param($session, $log, $myLoopPid)
     $strikes = 0
     $connectedPid = 0   # PID d'un claude ayant connecte AU MOINS une fois
+    $hb = 0             # DIAG 2026-09-07 : heartbeat ~5 min -> derniere ligne HEARTBEAT ~= heure de mort de la loop
     while ($true) {
         Start-Sleep -Seconds 20
+        $hb++
+        if ($hb -ge 15) { $hb = 0; "$(Get-Date -Format s) HEARTBEAT: $session loop PID $myLoopPid alive" | Out-File -FilePath $log -Append -Encoding utf8 }
 
         # --- SINGLETON PERMANENT : la loop la plus ANCIENNE gagne -----------
         # Ordre total (StartTime puis PID) => convergence deterministe vers UNE
