@@ -131,13 +131,19 @@ Start-Job -Name "wd-$SessionName" -ArgumentList $SessionName, $logFile, $PID -Sc
 
 while ($true) {
     try {
-        # "Repart a neuf" : on efface l'historique persistant de CET UUID avant
-        # chaque lancement. Meme session-id (mobile recycle une seule entree)
-        # MAIS conversation fraiche (pas de reprise, pas de gonflement de
-        # contexte, pas de risque type --continue). Si le fichier n'existe pas
-        # encore, le -ErrorAction SilentlyContinue rend l'operation inoffensive.
-        Get-ChildItem -Path $projectStore -Filter "$RemoteSessionId*" -ErrorAction SilentlyContinue |
-            Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        # CONTINUITE DE CONVERSATION (2026-09-08) : on N'EFFACE PLUS l'historique
+        # de cet UUID avant lancement. En reutilisant le MEME --session-id sans
+        # nettoyer le store, claude REPREND la conversation existante (historique
+        # intact) au lieu d'en ouvrir une vierge -> tu peux continuer la meme
+        # discussion pendant des jours, meme apres les relances au logon.
+        # Doc Claude Code : --remote-control + --session-id sur un id deja present
+        # = reprise (et le canal mobile se remonte). L'ancienne version effacait
+        # le store a chaque lancement (session fraiche) : c'etait la cause du
+        # "ca change de conversation tous les jours". L'erreur "Session ID already
+        # in use" ne se produit QUE si un autre claude avec ce meme id tourne
+        # ENCORE au lancement -- pas notre cas (l'ancien est mort avant la relance
+        # via logon/watchdog/crash). $projectStore reste defini pour diag.
+        $null = $projectStore
 
         # On appelle claude DIRECTEMENT (operateur &), pas via Start-Process
         # -WindowStyle Hidden. claude a besoin d'heriter de la console (cachee)
