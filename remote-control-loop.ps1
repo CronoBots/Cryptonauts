@@ -131,19 +131,21 @@ Start-Job -Name "wd-$SessionName" -ArgumentList $SessionName, $logFile, $PID -Sc
 
 while ($true) {
     try {
-        # CONTINUITE DE CONVERSATION (2026-09-08) : on N'EFFACE PLUS l'historique
-        # de cet UUID avant lancement. En reutilisant le MEME --session-id sans
-        # nettoyer le store, claude REPREND la conversation existante (historique
-        # intact) au lieu d'en ouvrir une vierge -> tu peux continuer la meme
-        # discussion pendant des jours, meme apres les relances au logon.
-        # Doc Claude Code : --remote-control + --session-id sur un id deja present
-        # = reprise (et le canal mobile se remonte). L'ancienne version effacait
-        # le store a chaque lancement (session fraiche) : c'etait la cause du
-        # "ca change de conversation tous les jours". L'erreur "Session ID already
-        # in use" ne se produit QUE si un autre claude avec ce meme id tourne
-        # ENCORE au lancement -- pas notre cas (l'ancien est mort avant la relance
-        # via logon/watchdog/crash). $projectStore reste defini pour diag.
-        $null = $projectStore
+        # SESSION JETABLE (revert 2026-09-08 du commit 568d275) : on efface
+        # l'historique persistant de CET UUID AVANT chaque lancement. Meme
+        # session-id (mobile recycle une seule tuile) MAIS conversation fraiche.
+        # POURQUOI ce revert : la tentative "continuite" (ne plus wiper pour
+        # reprendre la conversation) laissait l'ancien state de session marque
+        # "in use" -> au redemarrage du loop (logon/veille/watchdog/crash, ~1x/j)
+        # claude ressortait AUSSITOT sur "Error: Session ID <uuid> is already in
+        # use." a CHAQUE tentative (toutes les 3 s) => session distante invisible
+        # pendant des heures. Diagnostic mesure le 2026-09-08 : un id FRAIS ou un
+        # store wipe passe le check, l'id fixe non-wipe le declenche. Meme lecon
+        # que --continue : la session remote DOIT rester jetable pour survivre aux
+        # relances. La continuite de conversation est incompatible avec ce loop.
+        # -ErrorAction SilentlyContinue = inoffensif si le store n'existe pas.
+        Get-ChildItem -Path $projectStore -Filter "$RemoteSessionId*" -ErrorAction SilentlyContinue |
+            Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
         # On appelle claude DIRECTEMENT (operateur &), pas via Start-Process
         # -WindowStyle Hidden. claude a besoin d'heriter de la console (cachee)
