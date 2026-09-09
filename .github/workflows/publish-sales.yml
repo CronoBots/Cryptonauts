@@ -1,0 +1,53 @@
+name: Publish sales to Discord
+
+# Publie les nouvelles ventes/mints Cryptonauts sur Discord — remplace main.js qui
+# tournait sur le PC. Tourne sur un runner GitHub CLOUD (ubuntu), plus besoin du PC.
+#
+# Pourquoi le cloud marche ici alors que refresh-data.yml exige le PC : le 429 de
+# crypto.com ne frappe que l'AGRÉGATION lourde du classement (des centaines de
+# requêtes). Les requêtes « ventes/métriques » sont légères et passent depuis une
+# IP datacenter (vérifié). Les holdings + handles Twitter sont lus dans data.json
+# (généré par le refresh), donc plus de Puppeteer.
+#
+# SECRETS À CRÉER (Settings → Secrets and variables → Actions) :
+#   • DISCORD_WEBHOOK_URLS          (obligatoire) — une ou plusieurs URLs de webhook,
+#                                    séparées par des virgules.
+#   • DISCORD_HEARTBEAT_WEBHOOK_URL (optionnel)  — webhook du « Hourly check ✅ ».
+
+on:
+  schedule:
+    - cron: '0 * * * *'    # toutes les heures (comme main.js)
+  workflow_dispatch: {}     # bouton « Run workflow » pour tester à la demande
+
+# Ne pas empiéter sur refresh-data (qui pousse aussi) ; sérialise les runs de publication.
+concurrency:
+  group: publish-sales
+  cancel-in-progress: false
+
+permissions:
+  contents: write           # pour committer Saves/Cryptonauts_Discord.json (dédup)
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest  # runner CLOUD gratuit — le PC n'est plus dans la boucle
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Publish new sales
+        run: node publish-sales.js
+        env:
+          DISCORD_WEBHOOK_URLS: ${{ secrets.DISCORD_WEBHOOK_URLS }}
+          DISCORD_HEARTBEAT_WEBHOOK_URL: ${{ secrets.DISCORD_HEARTBEAT_WEBHOOK_URL }}
+
+      - name: Persist dedup state
+        run: node .github/commit-sales-state.js
