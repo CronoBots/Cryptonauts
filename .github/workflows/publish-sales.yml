@@ -16,7 +16,10 @@ name: Publish sales to Discord
 
 on:
   schedule:
-    - cron: '0 * * * *'    # toutes les heures (comme main.js)
+    # Minute 23 (creuse) et NON la minute 0 : GitHub retarde/saute massivement les
+    # crons calés sur le début d'heure (créneau le plus chargé de la plateforme —
+    # recommandation officielle GitHub d'éviter '0 * * * *'). Toujours ~horaire.
+    - cron: '23 * * * *'
   workflow_dispatch: {}     # bouton « Run workflow » pour tester à la demande
 
 # Ne pas empiéter sur refresh-data (qui pousse aussi) ; sérialise les runs de publication.
