@@ -10,7 +10,7 @@ try {
 } catch (e) { /* 1er commit / fichier absent */ }
 
 const next = JSON.parse(fs.readFileSync('data.json', 'utf8'));
-const strip = (d) => JSON.stringify({ c: d.collectionsData, g: d.globalOwnersData });
+const strip = (d) => JSON.stringify({ c: d.collectionsData, g: d.globalOwnersData, a: d.externalAssets });
 
 if (strip(prev) === strip(next)) {
   console.log('Classement inchangé — aucun commit.');

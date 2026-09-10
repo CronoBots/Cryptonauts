@@ -773,6 +773,39 @@ async function fetchIpfsJson(pathNoScheme) {
   return null;
 }
 
+// Carte des NFT d'une collection Crovia (tokenId → nom + hash image CDN), pour le Sales Bot
+// (vignettes) ET la galerie de la collection sur le site. Source : API Crovia bulk paginée
+// (/collections/{c}/nfts). Le hash est l'avant-dernier segment de l'URL image (cdn.crovia.app/
+// {contract}/{HASH}/full.webp) — même CDN que le bot Discord, fiable contrairement aux passerelles
+// IPFS publiques. Injectée dans data.json (externalAssets) → index.html la rend via croviaImg().
+const CROVIA_NFT_H = { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126 Safari/537.36', 'Accept': 'application/json', 'Referer': 'https://crovia.app/' }, timeout: 20000, validateStatus: s => s === 200 };
+const croviaHashOf = img => { const p = String(img || '').split('/'); return (p.length >= 2 && /^[0-9a-f]{16,}$/i.test(p[p.length - 2])) ? p[p.length - 2] : ''; };
+// Un NFT via l'API par-token (/nfts/{c}/{id}) → { i, n, h } ou null. Fiable, sert de complément
+// quand l'endpoint bulk plafonne (voir fetchExternalAssets).
+async function fetchOneAsset(contract, tokenId) {
+  try {
+    const r = await axios.get(`${CROVIA_API}/nfts/${contract}/${tokenId}`, CROVIA_NFT_H);
+    const nft = (r.data && r.data.data !== undefined) ? r.data.data : r.data;
+    const h = croviaHashOf(nft && nft.image);
+    return h ? { i: Number(tokenId), n: (nft && nft.name) || ('#' + tokenId), h } : null;
+  } catch (e) { return null; }
+}
+// Carte NFT d'une collection : bulk /collections/{c}/nfts (⚠ plafonné à 100, offset ignoré) PUIS
+// complément par-token pour chaque tokenId du flux Sales Bot non couvert (garantit une vignette pour
+// TOUTE vente/mint, même tokenId > 100). `feedIds` = tokenIds à garantir (ventes+mints récents).
+async function fetchExternalAssets(contract, feedIds) {
+  const map = new Map();
+  try {
+    const r = await axios.get(`${CROVIA_API}/collections/${contract}/nfts?limit=100`, CROVIA_NFT_H);
+    const d = (r.data && r.data.data !== undefined) ? r.data.data : r.data;
+    if (Array.isArray(d)) for (const x of d) { const h = croviaHashOf(x.image); const id = Number(x.tokenId); if (h && !map.has(id)) map.set(id, { i: id, n: x.name || ('#' + id), h }); }
+  } catch (e) { console.warn(`⚠ assets bulk ${contract} : ${e.message}`); }
+  // Complète les tokens du flux non déjà couverts (endpoint bulk plafonné à 100).
+  const missing = [...new Set((feedIds || []).map(Number))].filter(id => !map.has(id));
+  await mapPool(missing, 4, async (id) => { const a = await fetchOneAsset(contract, id); if (a) map.set(id, a); });
+  return [...map.values()].sort((a, b) => a.i - b.i);
+}
+
 // Enrichit chaque vente/mint du Sales Bot avec le VRAI NFT : nom (n) + image (c, CID IPFS), résolus via
 // tokenURI(id) on-chain (contrat de CHAQUE entrée) → métadonnée IPFS. Best-effort : sans ça, le Sales Bot
 // retombe sur le logo de la collection. Chaque entrée doit porter son `contract`.
@@ -794,7 +827,7 @@ async function enrichExternalImages(items) {
   console.log(`✅ Images des ventes/mints externes résolues : ${ok}/${items.length} (tokenURI → IPFS).`);
 }
 
-function writeCryptonautsData(collectionsData, globalOwnerNFTs, ownersData, externalCollections, v3Sales) {
+function writeCryptonautsData(collectionsData, globalOwnerNFTs, ownersData, externalCollections, v3Sales, externalAssets) {
   // Prepare collectionsData, including all collections from the collections array
   const allCollectionsData = collections.map(collection => {
     const scrapedData = collectionsData.find(data => data.collectionId === collection.id) || {
@@ -841,7 +874,7 @@ function writeCryptonautsData(collectionsData, globalOwnerNFTs, ownersData, exte
 
   // Écrit le classement dans data.json (consommé par index.html via fetch).
   // v3Sales = mints V3 récents (on-chain) pour le Sales Bot — remplace l'ancien tableau figé.
-  const out = { generatedAt: new Date().toISOString(), collectionsData: allCollectionsData, globalOwnersData, v3Sales: v3Sales || [] };
+  const out = { generatedAt: new Date().toISOString(), collectionsData: allCollectionsData, globalOwnersData, v3Sales: v3Sales || [], externalAssets: externalAssets || {} };
   try {
     fs.writeFileSync('data.json', JSON.stringify(out), 'utf8');
     console.log(`✅ data.json écrit : ${allCollectionsData.length} collections · ${globalOwnersData.length} holders globaux.`);
@@ -1182,6 +1215,7 @@ async function main() {
     //  • REPLI : scan on-chain complet (fetchV3Holders) si l'API tombe (V3 uniquement).
     // Chaque vente/mint est taguée `col` (titre) + `contract` → flux Sales Bot multi-collections.
     const externalCollections = [];
+    const externalAssets = {};
     let externalSales = [];
     for (const cfg of CROVIA_COLLECTIONS) {
       if (!cfg.contract) { console.log(`ℹ ${cfg.title} : pas encore lancée (contract vide) → ignorée.`); continue; }
@@ -1212,10 +1246,22 @@ async function main() {
 
     // Flux Sales Bot = ventes (cross-marketplace) + mints de TOUTES les collections, triés par date, max 60.
     externalSales = externalSales.sort((a, b) => b.ts - a.ts).slice(0, 60);
-    // Résout l'image + le nom de chaque NFT (tokenURI on-chain → métadonnée IPFS) pour le bon visuel.
-    await enrichExternalImages(externalSales);
+    // Cartes NFT (image + nom) par collection : galerie du site + vignettes Sales Bot. Construites APRÈS
+    // le slice pour garantir une image à CHAQUE token du flux (l'endpoint bulk plafonne à 100).
+    const feedByContract = {};
+    for (const m of externalSales) (feedByContract[m.contract] = feedByContract[m.contract] || []).push(Number(m.t));
+    for (const cfg of CROVIA_COLLECTIONS) {
+      if (!cfg.contract) continue;
+      const assets = await fetchExternalAssets(cfg.contract, feedByContract[cfg.contract] || []);
+      if (assets.length) externalAssets[cfg.contract] = assets;
+      console.log(`✅ ${cfg.title} : ${assets.length} assets indexés (image + nom).`);
+    }
+    // Nom de chaque vente/mint depuis la carte d'assets (l'image est gérée côté site via externalAssets).
+    const nameByKey = {};
+    for (const [c, arr] of Object.entries(externalAssets)) for (const a of arr) nameByKey[c + ':' + a.i] = a.n;
+    for (const m of externalSales) { const n = nameByKey[m.contract + ':' + Number(m.t)]; if (n) m.n = n; }
 
-    writeCryptonautsData(collectionsData, globalOwnerNFTs, ownersData, externalCollections, externalSales);
+    writeCryptonautsData(collectionsData, globalOwnerNFTs, ownersData, externalCollections, externalSales, externalAssets);
 
   } catch (error) {
     console.error('Main execution failed:', error.message);
