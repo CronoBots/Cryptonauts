@@ -221,6 +221,10 @@ async function publishSale(discord_text, image_url, saleId, nftName, sellerTwitt
     if (!SEED) console.log(`Sale successfully sent to Discord for ${nftName}`);
     publishedSales.add(saleId);
     savePublishedSales(publishedSales, config.shared.saveFileDiscord);
+    // Throttle optionnel entre posts réels (POST_DELAY_MS) — évite le 429 Discord lors
+    // d'un rattrapage massif. Non utilisé en run normal (peu de posts) ni en SEED/DRY_RUN.
+    const delay = parseInt(process.env.POST_DELAY_MS, 10) || 0;
+    if (delay && !SEED) await new Promise(r => setTimeout(r, delay));
   }
 
   return success;
