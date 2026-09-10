@@ -291,11 +291,10 @@ const croviaConfig = {
   recentDays: 2,
   publishMints: true,
   mintSpanBlocks: 400000,
-  maxMintsPerRun: 12,
+  maxMintsPerRun: parseInt(process.env.MAX_MINTS_PER_RUN, 10) || 12, // surchargeable via env (seed initial)
   collections: [
+    { name: 'CRYPTONAUTS CIVILIZATIONS', contract: '0x721559274c8a739d1e5e35506f91a7ce56868c7f', mintPriceCro: 399 },
     { name: 'QUANTUM CRYPTONAUTS V3', contract: '0x840d5e2df597ab3dcfed4e5fc883c8d87606748d', mintPriceCro: 400 },
-    // Prochaine collection — ACTIVER au lancement (contrat déployé) → ventes + mints auto :
-    // { name: 'CRYPTONAUTS CIVILIZATIONS', contract: '', mintPriceCro: 499 },
   ]
 };
 

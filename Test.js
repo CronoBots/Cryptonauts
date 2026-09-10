@@ -401,10 +401,9 @@ const CROVIA_API = 'https://crovia.app/api/v1';
 // reste (données live + ventes/mints dans le bot) devient automatique. `contract` vide = ignorée.
 // Ordre = ordre d'affichage (la plus récente en premier).
 const CROVIA_COLLECTIONS = [
-  // Prochaine collection — ACTIVER au lancement (≈ 10 sept. 2026) en renseignant `contract` :
-  { id: 'collection-civilizations', title: 'Cryptonauts Civilizations', contract: '',
+  { id: 'collection-civilizations', title: 'Cryptonauts Civilizations', contract: '0x721559274c8a739d1e5e35506f91a7ce56868c7f',
     image: 'assets/civilizations-logo.jpg', banner: 'assets/civilizations-banner.jpg',
-    alt: 'Cryptonauts Civilizations collection icon', mintTotal: 359, mintPriceCro: 499 },
+    alt: 'Cryptonauts Civilizations collection icon', mintTotal: 359, mintPriceCro: 399 },
   { id: 'collection-v3', title: 'Quantum Cryptonauts V3', contract: '0x840d5e2df597ab3dcfed4e5fc883c8d87606748d',
     image: 'assets/v3-logo.jpg?v=2', banner: 'assets/v3-banner.jpg?v=2',
     alt: 'Quantum Cryptonauts V3 COLLECTION ICON', mintTotal: 299, mintPriceCro: 400 },
